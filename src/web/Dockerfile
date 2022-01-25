@@ -3,6 +3,7 @@ FROM python:3.7-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=karsts.settings.docker
 
 RUN python -m pip install --upgrade pip
 
