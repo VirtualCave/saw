@@ -1,0 +1,32 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h2>S3</h2>
+    <span>Owner: {{ aws_resources.s3.owner }}</span>
+    <table class="table table-striped">
+        <thead class=""thead-dark>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Tags(key=>value)</th>
+                <th scope="col">Creation date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bucket in aws_resources.s3.buckets %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{bucket.name}}</td>
+                    <td>
+                        {% for tag, value in bucket.tags.items %}
+                            {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
+                        {% empty %}
+                            No tags
+                        {% endfor %}
+                    </td>
+                    <td>{{bucket.creation_date}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

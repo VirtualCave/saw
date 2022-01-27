@@ -22,3 +22,4 @@ docker-compose run web /usr/local/bin/python django_project/manage.py collectsta
 * [Django Development with docker compose](https://realpython.com/django-development-with-docker-compose-and-machine/)
 * [Django dockerized application](https://realpython.com/django-setup/)
 * [Django production docker setup](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
+* [Mozilla Django learn](https://developer.mozilla.org/es/docs/Learn/Server-side/Django/Authentication)
