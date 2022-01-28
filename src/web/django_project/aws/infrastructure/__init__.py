@@ -15,10 +15,14 @@ def scan_resources(
     result = dict()
     result["s3"] = s3_scan(access_key_id, secret_access_key)
 
-    ec2 = AwsEc2Client(access_key_id, secret_access_key, region)
-    result["ec2"] = ec2.list_resources()
-
+    result["ec2"] = ec2_scan(access_key_id, secret_access_key, region)
     return result
+
+
+def ec2_scan(access_key_id, secret_access_key, region):
+    ec2 = AwsEc2Client(access_key_id, secret_access_key, region)
+    ec2_response_dto = ec2.list_resources()
+    return ec2_response_dto.dict()
 
 
 def s3_scan(access_key_id, secret_access_key):

@@ -36,7 +36,7 @@ class AwsEc2ResponseDto(AWSResponseDto):
                 "Constructor needs response or error, but booth are None"
             )
 
-    def __dict__(self):
+    def dict(self):
         if self.get_status() == AWSResponseDto.KO:
             return {
                 "status": self.get_status(),
@@ -45,6 +45,7 @@ class AwsEc2ResponseDto(AWSResponseDto):
         else:
             return {
                 "status": self.get_status(),
+                "response": self.response
             }
 
 
@@ -89,10 +90,9 @@ class AwsEc2Client:
                             "owner": reservation["OwnerId"],
                         }
                     )
-            return {"vms": response}
+            return AwsEc2ResponseDto(aws_response=response)
         except ClientError as e:
             logging.error(f"AWS client error: {e}")
             return AwsEc2ResponseDto(error=e)
         except Exception as e:
             logging.error(f"Error processing aws client response: {e}")
-            return AwsEc2ResponseDto(error=e)

@@ -1,39 +1,43 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h2>S3</h2>
-    <span>Owner: {{ aws_resources.s3.owner }}</span>
-    <table class="table table-striped">
-        <thead class=""thead-dark>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Tags(key=>value)</th>
-                <th scope="col">Creation date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for bucket in aws_resources.s3.buckets %}
+    <div>
+        <h2>S3</h2>
+        {% if aws_resources.s3 %}
+            <span>Owner: {{ aws_resources.s3.owner }}</span>
+            <table class="table table-striped">
+                <thead class=""thead-dark>
                 <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{bucket.name}}</td>
-                    <td>
-                        {% for tag, value in bucket.tags.items %}
-                            {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
-                        {% empty %}
-                            No tags
-                        {% endfor %}
-                    </td>
-                    <td>{{bucket.creation_date}}</td>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Tags(key=>value)</th>
+                    <th scope="col">Creation date</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+            </thead>
+                <tbody>
+                {% for bucket in aws_resources.s3.buckets %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{bucket.name}}</td>
+                        <td>
+                            {% for tag, value in bucket.tags.items %}
+                                {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
+                            {% empty %}
+                                No tags
+                            {% endfor %}
+                        </td>
+                        <td>{{bucket.creation_date}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        {% else %}
+            <span>Error: {{aws_ressources.s3.error}}</span>
+        {% endif %}
+    </div>
     <div>
         <h2>EC2</h2>
-        {% if aws_resources.ec2 %}
-            <span>Owner: {{aws_resources.ec2.owner}}</span>
+        {% if aws_resources.ec2.status == "ok" %}
             <table class="table table-striped">
                 <thead class=""thead-dark>
                     <tr>
@@ -48,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for vm in aws_resources.ec2.vms %}
+                    {% for vm in aws_resources.ec2.response %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td>{{vm.id}}</td>
@@ -69,7 +73,15 @@
                 </tbody>
             </table>
         {% else %}
+            <span>Error: {{aws_ressources.ec2.error}}</span>
+        {% endif %}
+    </div>
+    <div>
+        <h2>SQS</h2>
+        {% if aws_resources.sqs %}
+            <span>
 
+            </span>
         {% endif %}
     </div>
 {% endblock %}
