@@ -3,12 +3,21 @@ import logging
 import boto3
 from botocore.client import ClientError
 
+from aws.infrastructure.dtos import AwsEc2Client
+
 S3 = "s3"
+EC2 = "ec2"
 
 
-def scan_resources(access_key_id, secret_access_key, service=None, business=None):
+def scan_resources(
+    access_key_id, secret_access_key, region, service=None, business=None
+):
     result = dict()
     result["s3"] = s3_scan(access_key_id, secret_access_key)
+
+    ec2 = AwsEc2Client(access_key_id, secret_access_key, region)
+    result["ec2"] = ec2.list_resources()
+
     return result
 
 
@@ -37,7 +46,4 @@ def s3_get_bucket_tags(s3_client, bucket_name):
         logging.error(f"Client error: {e}")
         return {}
     bucket_tags = tags_response.get("TagSet", [])
-    return {
-        bt["Key"]: bt["Value"]
-        for bt in bucket_tags
-    }
+    return {bt["Key"]: bt["Value"] for bt in bucket_tags}
