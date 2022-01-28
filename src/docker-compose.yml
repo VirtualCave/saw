@@ -9,6 +9,9 @@ services:
     links:
       - postgres:postgres
       - redis:redis
+    depends_on:
+      - postgres
+      - redis
     volumes:
       - ./web/:/opt/app/
       - web-static:/opt/app/static
@@ -26,6 +29,8 @@ services:
       - web-static:/opt/app/static
     links:
       - web:web
+    depends_on:
+      - web
 
   postgres:
     restart: always
