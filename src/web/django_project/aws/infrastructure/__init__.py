@@ -9,13 +9,12 @@ S3 = "s3"
 EC2 = "ec2"
 
 
-def scan_resources(
-    access_key_id, secret_access_key, region, service=None, business=None
-):
+def scan_resources(access_key_id, secret_access_key, region):
     result = dict()
-    result["s3"] = s3_scan(access_key_id, secret_access_key)
 
+    result["s3"] = s3_scan(access_key_id, secret_access_key)
     result["ec2"] = ec2_scan(access_key_id, secret_access_key, region)
+
     return result
 
 

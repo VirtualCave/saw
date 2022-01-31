@@ -25,6 +25,7 @@ class AWSResponseDto:
 
 
 class AwsEc2ResponseDto(AWSResponseDto):
+
     def __init__(self, aws_response: dict = None, error: Exception = None):
         super().__init__()
         if error:
