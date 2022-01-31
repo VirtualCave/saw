@@ -2,7 +2,8 @@
 
 {% block content %}
 
-<form action="{% url 'main' %}" method="post">{% csrf_token %}
+<form action="{% url 'main' %}" method="post">
+    {% csrf_token %}
     <label for="access_key_id">Access key id: </label>
     <input id="access_key_id" type="text" name="access_key_id" value="{{ current_id }}">
 
@@ -14,6 +15,11 @@
 
     <input type="submit" value="Query">
 </form>
+
+{% block js %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
 
 {% if aws_resources %}
 <div>
