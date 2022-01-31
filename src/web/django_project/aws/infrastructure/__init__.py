@@ -9,11 +9,12 @@ S3 = "s3"
 EC2 = "ec2"
 
 
-def scan_resources(access_key_id, secret_access_key, region):
+def scan_resources(access_key_id, secret_access_key, region, tags):
     result = dict()
 
     result["s3"] = s3_scan(access_key_id, secret_access_key)
     result["ec2"] = ec2_scan(access_key_id, secret_access_key, region)
+    # TODO: uses tags to filter!
 
     return result
 
@@ -28,7 +29,14 @@ def s3_scan(access_key_id, secret_access_key):
     s3_client = boto3.client(
         S3, aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key
     )
-    response = s3_client.list_buckets()
+    try:
+        response = s3_client.list_buckets()
+    except ClientError as e:
+        return {
+            "status": "ko",
+            "error": f"{repr(e)}"
+        }
+
     owner = response["Owner"]["ID"]
     buckets = []
     for b in response["Buckets"]:
@@ -39,7 +47,13 @@ def s3_scan(access_key_id, secret_access_key):
                 "tags": s3_get_bucket_tags(s3_client, b["Name"]),
             }
         )
-    return {"owner": owner, "buckets": buckets}
+    return {
+        "status": "ok",
+        "response": {
+            "owner": owner,
+            "buckets": buckets
+        }
+    }
 
 
 def s3_get_bucket_tags(s3_client, bucket_name):

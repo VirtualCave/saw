@@ -25,7 +25,6 @@ class AWSResponseDto:
 
 
 class AwsEc2ResponseDto(AWSResponseDto):
-
     def __init__(self, aws_response: dict = None, error: Exception = None):
         super().__init__()
         if error:
@@ -44,10 +43,7 @@ class AwsEc2ResponseDto(AWSResponseDto):
                 "error": repr(self.error),
             }
         else:
-            return {
-                "status": self.get_status(),
-                "response": self.response
-            }
+            return {"status": self.get_status(), "response": self.response}
 
 
 class AwsEc2Client:
