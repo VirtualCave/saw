@@ -2,95 +2,140 @@
 
 {% block content %}
 
-<form action="{% url 'main' %}" method="post">{% csrf_token %}
-    <label for="access_key_id">Access key id: </label>
-    <input id="access_key_id" type="text" name="access_key_id" value="{{ current_id }}">
 
-    <label for="secret_access_key">Secret access key: </label>
-    <input id="secret_access_key" type="text" name="secret_access_key" value="{{ current_key }}">
+<div class="container-fluid">
+    <div>
+        <h1>AWS resources <small>Search by credentials, region and tags</small></h1>
+        <form action="{% url 'main' %}" role="form" method="post">{% csrf_token %}
+            <div class="form-group">
+                    <div class="col-md-8">
+                        <label>AWS credentials: </label>
+                    <div/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input id="access_key" type="text" name="access_key" placeholder="Access key ID" required="required">
+                        <input id="secret_access_key" type="text" name="secret_access_key" placeholder="Secret access key" required="required">
+                    </div>
+                    <div class="col-md-4">
+                        <input id="aws_region" type="text" name="aws_region" placeholder="AWS region" required="required">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Tags filters: </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input id="tag_1" type="text" name="tag_1" placeholder="tag">
+                        <input id="value_1" type="text" name="value_1" placeholder="value">
+                    </div>
+                    <div class="col-md-6">
+                        <input id="tag_2" type="text" name="tag_2" placeholder="tag">
+                        <input id="value_2" type="text" name="value_2" placeholder="value">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="submit" class="btn btn-success pull-left" value="Query">
+                    </div>
+                </div>
+            </div>
+            </div>
+        </form>
+    </div>
 
-    <label for="aws_region">AWS region: </label>
-    <input id="aws_region" type="text" name="aws_region" value="{{ aws_region }}">
-
-    <input type="submit" value="Query">
-</form>
-
-{% if aws_resources %}
-<div>
-    <h2>S3</h2>
-    {% if aws_resources.s3 %}
-        <table class="table table-striped">
-            <thead class=""thead-dark>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Tags(key=>value)</th>
-                <th scope="col">Creation date</th>
-            </tr>
-        </thead>
-            <tbody>
-            {% for bucket in aws_resources.s3.buckets %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{bucket.name}}</td>
-                    <td>
-                        {% for tag, value in bucket.tags.items %}
-                            {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
-                        {% empty %}
-                            No tags
-                        {% endfor %}
-                    </td>
-                    <td>{{bucket.creation_date}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-    {% else %}
-        <span>Error: {{aws_ressources.s3.error}}</span>
+    {% if access_key_id and secret_access_key %}
+        <div>
+            Access key id: {{ access_key_id }}
+            Secret access: {{ secret_access_key }}
+        </div>
     {% endif %}
-</div>
-<div>
-    <h2>EC2</h2>
-    {% if aws_resources.ec2.status == "ok" %}
-        <table class="table table-striped">
-            <thead class=""thead-dark>
+
+    {% if aws_resources %}
+    <div class="row">
+        <h2>S3</h2>
+        {% if aws_resources.s3.status == "ok" %}
+            <table class="table table-striped">
+                <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Id</th>
-                    <th scope="col">Reservation</th>
-                    <th scope="col">Size</th>
-                    <th scope="col">State</th>
-                    <th scope="col">Owner</th>
+                    <th scope="col">Name</th>
                     <th scope="col">Tags(key=>value)</th>
-                    <th scope="col">Launch time</th>
+                    <th scope="col">Creation date</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for vm in aws_resources.ec2.response %}
-                    <span>Owner: {{aws_resources.ec2.response.owner}}</span>
+                <tbody>
+                {% for bucket in aws_resources.s3.response.buckets %}
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
-                        <td>{{vm.id}}</td>
-                        <td>{{vm.reservation}}</td>
-                        <td>{{vm.type}}</td>
-                        <td>{{vm.state}}</td>
-                        <td>{{vm.owner}}</td>
+                        <td>{{bucket.name}}</td>
                         <td>
-                            {% for tag, value in vm.tags.items %}
+                            {% for tag, value in bucket.tags.items %}
                                 {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
                             {% empty %}
                                 No tags
                             {% endfor %}
                         </td>
-                        <td>{{vm.launch_time}}</td>
+                        <td>{{bucket.creation_date}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
-        </table>
-    {% else %}
-        <span>Error: {{aws_ressources.ec2.error}}</span>
-    {% endif %}
-</div>
+            </table>
+        {% else %}
+            <span>Error on boto3: {{aws_ressources.s3.error}}</span>
+        {% endif %}
+    </div>
+    <div class="row">
+        <h2>EC2</h2>
+        {% if aws_resources.ec2.status == "ok" %}
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Reservation</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">State</th>
+                        <th scope="col">Owner</th>
+                        <th scope="col">Tags(key=>value)</th>
+                        <th scope="col">Launch time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vm in aws_resources.ec2.response %}
+                        <span>Owner: {{aws_resources.ec2.response.owner}}</span>
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{vm.id}}</td>
+                            <td>{{vm.reservation}}</td>
+                            <td>{{vm.type}}</td>
+                            <td>{{vm.state}}</td>
+                            <td>{{vm.owner}}</td>
+                            <td>
+                                {% for tag, value in vm.tags.items %}
+                                    {{ forloop.counter }}. {{tag}} <b>=></b> {{value}} <br>
+                                {% empty %}
+                                    No tags
+                                {% endfor %}
+                            </td>
+                            <td>{{vm.launch_time}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <span>Error on boto3: {{aws_ressources.ec2.error}}</span>
+        {% endif %}
+    </div>
 {% endif %}
+</div>
 
 {% endblock %}
